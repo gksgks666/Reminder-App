@@ -1,4 +1,4 @@
-import { View, Text, TextInput, Button } from "react-native";
+import { View, Text, TextInput, Button, Pressable } from "react-native";
 import { useState } from "react";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -36,7 +36,7 @@ export default function NotificationScreen() {
 
     await scheduleDailyNotification(newNotification);
 
-    router.back();
+    router.replace("/");
   };
 
   const scheduleDailyNotification = async (notification: NotificationItem) => {
@@ -48,8 +48,9 @@ export default function NotificationScreen() {
       },
       trigger: {
         type: "daily",
-        hour: 9,
+        hour: 1,
         minute: 0,
+        seconds: 5,
       } as Notifications.DailyTriggerInput,
     });
   };
