@@ -1,6 +1,6 @@
-import { View, Text, Button, FlatList, Pressable } from "react-native";
-import { useState, useEffect } from "react";
-import { router } from "expo-router";
+import { View, Text, Button, FlatList } from "react-native";
+import { useState, useCallback } from "react";
+import { useRouter, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
 
@@ -13,23 +13,54 @@ interface NotificationItem {
 }
 
 export default function HomeScreen() {
+  const router = useRouter();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
-  useEffect(() => {
-    loadNotifications();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadNotifications();
+    }, [])
+  );
 
   const loadNotifications = async () => {
     const savedNotifications = await AsyncStorage.getItem("notifications");
-    if (savedNotifications) {
-      setNotifications(JSON.parse(savedNotifications));
-    }
+    const data = savedNotifications ? JSON.parse(savedNotifications) : [];
+    setNotifications(data);
+    updateNotificationBar(data);
   };
 
   const deleteNotification = async (id: string) => {
     const updatedList = notifications.filter((item) => item.id !== id);
     setNotifications(updatedList);
     await AsyncStorage.setItem("notifications", JSON.stringify(updatedList));
+    updateNotificationBar(updatedList);
+  };
+
+  const completeNotification = async (id: string) => {
+    const updatedList = notifications.map((item) =>
+      item.id === id ? { ...item, completed: true } : item
+    );
+
+    setNotifications(updatedList);
+    await AsyncStorage.setItem("notifications", JSON.stringify(updatedList));
+    updateNotificationBar(updatedList);
+  };
+
+  const updateNotificationBar = async (notifiList: NotificationItem[]) => {
+    const activeNoti = notifiList.filter((item) => !item.completed);
+
+    if (activeNoti) {
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "📌 오늘의 할 일",
+          body: `${activeNoti.length}개의 할 일이 있습니다.`,
+          sticky: true,
+        },
+        trigger: null,
+      });
+    } else {
+      await Notifications.dismissAllNotificationsAsync();
+    }
   };
 
   return (
@@ -44,6 +75,11 @@ export default function HomeScreen() {
           <View style={{ padding: 10, borderBottomWidth: 1 }}>
             <Text>{item.title}</Text>
             <Text>{item.description}</Text>
+            <Button
+              title="오늘 완료"
+              onPress={() => completeNotification(item.id)}
+              disabled={item.completed}
+            />
             <Button title="삭제" onPress={() => deleteNotification(item.id)} />
           </View>
         )}

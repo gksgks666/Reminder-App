@@ -1,6 +1,6 @@
 import { View, Text, TextInput, Button, Pressable } from "react-native";
 import { useState } from "react";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
 
@@ -13,6 +13,7 @@ interface NotificationItem {
 }
 
 export default function NotificationScreen() {
+  const router = useRouter();
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
 
@@ -26,33 +27,20 @@ export default function NotificationScreen() {
       completed: false,
     };
 
-    const savedNotifications = await AsyncStorage.getItem("notifications");
-    const notifications: NotificationItem[] = savedNotifications
-      ? JSON.parse(savedNotifications)
-      : [];
-
+    const saved = await AsyncStorage.getItem("notifications");
+    const notifications = saved ? JSON.parse(saved) : [];
     notifications.push(newNotification);
     await AsyncStorage.setItem("notifications", JSON.stringify(notifications));
 
-    await scheduleDailyNotification(newNotification);
-
+    setTitle("");
+    setDescription("");
     router.replace("/");
   };
 
-  const scheduleDailyNotification = async (notification: NotificationItem) => {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: notification.title,
-        body: notification.description || "오늘의 알림",
-        sound: true,
-      },
-      trigger: {
-        type: "daily",
-        hour: 1,
-        minute: 0,
-        seconds: 5,
-      } as Notifications.DailyTriggerInput,
-    });
+  const backNotification = () => {
+    setTitle("");
+    setDescription("");
+    router.back();
   };
 
   return (
@@ -71,7 +59,7 @@ export default function NotificationScreen() {
         style={{ borderWidth: 1, padding: 8, marginBottom: 8 }}
       />
       <Button title="추가" onPress={addNotification} />
-      <Button title="뒤로 가기" onPress={() => router.back()} />
+      <Button title="뒤로 가기" onPress={backNotification} />
     </View>
   );
 }
