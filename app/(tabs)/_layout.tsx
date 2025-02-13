@@ -12,11 +12,34 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function TabLayout() {
   const colorScheme = useColorScheme();
 
-  useEffect(() => {
-    setupDailyReset();
-  }, []);
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: false,
+      shouldSetBadge: false,
+    }),
+  });
 
-  const setupDailyReset = async () => {
+  useEffect(() => {
+    (async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        alert("알림 권한이 거부되었습니다!");
+      }
+    })();
+    sendNotification();
+    //setupDailyReset();
+  }, []);
+  const sendNotification = async () => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "알림 제목 테스트",
+        body: "알림 내용 테스트",
+      },
+      trigger: null, // 즉시 보내려면 'trigger'에 'null'을 설정
+    });
+  };
+  /*  const setupDailyReset = async () => {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "📌 오늘의 할 일",
@@ -39,7 +62,7 @@ export default function TabLayout() {
       }));
       await AsyncStorage.setItem("notifications", JSON.stringify(data));
     }
-  };
+  }; */
 
   return (
     <Tabs
