@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import React, { useEffect } from "react";
-import { Platform } from "react-native";
+import { Platform, Alert } from "react-native";
 import { HapticTab } from "@/components/HapticTab";
 import { IconSymbol } from "@/components/ui/IconSymbol";
 import TabBarBackground from "@/components/ui/TabBarBackground";
@@ -24,21 +24,22 @@ export default function TabLayout() {
     (async () => {
       const { status } = await Notifications.requestPermissionsAsync();
       if (status !== "granted") {
-        alert("알림 권한이 거부되었습니다!");
+        Alert.alert("알림 권한이 거부되었습니다!");
       }
     })();
-    sendNotification();
+    //sendNotification();
     //setupDailyReset();
   }, []);
-  const sendNotification = async () => {
+  /* const sendNotification = async () => {
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "알림 제목 테스트",
         body: "알림 내용 테스트",
+        sticky: true,
       },
       trigger: null, // 즉시 보내려면 'trigger'에 'null'을 설정
     });
-  };
+  }; */
   /*  const setupDailyReset = async () => {
     await Notifications.scheduleNotificationAsync({
       content: {

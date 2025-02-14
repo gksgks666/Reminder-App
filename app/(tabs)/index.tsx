@@ -3,6 +3,7 @@ import { useState, useCallback } from "react";
 import { useRouter, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
+import { registerBackgroundTask } from "@/components/BackgroundTask";
 
 // 알림 데이터 타입 정의
 interface NotificationItem {
@@ -19,6 +20,7 @@ export default function HomeScreen() {
   useFocusEffect(
     useCallback(() => {
       loadNotifications();
+      registerBackgroundTask(); // 백그라운드 태스크 등록
     }, [])
   );
 
@@ -47,16 +49,23 @@ export default function HomeScreen() {
   };
 
   const updateNotificationBar = async (notifiList: NotificationItem[]) => {
+    await Notifications.dismissAllNotificationsAsync();
     const activeNoti = notifiList.filter((item) => !item.completed);
 
-    if (activeNoti) {
+    if (activeNoti.length > 0) {
       await Notifications.scheduleNotificationAsync({
         content: {
-          title: "📌 오늘의 할 일",
+          title: "오늘의 할 일",
           body: `${activeNoti.length}개의 할 일이 있습니다.`,
           sticky: true,
         },
-        trigger: null,
+        trigger: {
+          type: "calendar",
+          hour: 0,
+          minute: 0,
+          repeats: true,
+        } as Notifications.CalendarTriggerInput,
+        //trigger: null,
       });
     } else {
       await Notifications.dismissAllNotificationsAsync();
