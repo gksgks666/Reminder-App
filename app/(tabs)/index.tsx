@@ -1,26 +1,28 @@
 import { View, Text, Button, FlatList } from "react-native";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Notifications from "expo-notifications";
+import { showNotification } from "@/components/UpdateNotificationBar";
 import { registerBackgroundTask } from "@/components/BackgroundTask";
-
-// 알림 데이터 타입 정의
-interface NotificationItem {
-  id: string;
-  title: string;
-  description: string;
-  completed: boolean;
-}
+import { NotificationItem } from "@/types/Notification";
 
 export default function HomeScreen() {
   const router = useRouter();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
+  useEffect(() => {
+    registerBackgroundTask(); // 백그라운드 태스크 등록
+  }, []);
+
+  useEffect(() => {
+    if (notifications.length > 0) {
+      showNotification(notifications); // 앱 실행 시 상태바 알림 띄우기
+    }
+  }, [notifications]);
+
   useFocusEffect(
     useCallback(() => {
-      loadNotifications();
-      registerBackgroundTask(); // 백그라운드 태스크 등록
+      loadNotifications(); // 알림 목록 로드
     }, [])
   );
 
@@ -28,14 +30,14 @@ export default function HomeScreen() {
     const savedNotifications = await AsyncStorage.getItem("notifications");
     const data = savedNotifications ? JSON.parse(savedNotifications) : [];
     setNotifications(data);
-    updateNotificationBar(data);
+    showNotification(data);
   };
 
   const deleteNotification = async (id: string) => {
     const updatedList = notifications.filter((item) => item.id !== id);
     setNotifications(updatedList);
     await AsyncStorage.setItem("notifications", JSON.stringify(updatedList));
-    updateNotificationBar(updatedList);
+    showNotification(updatedList);
   };
 
   const completeNotification = async (id: string) => {
@@ -45,31 +47,7 @@ export default function HomeScreen() {
 
     setNotifications(updatedList);
     await AsyncStorage.setItem("notifications", JSON.stringify(updatedList));
-    updateNotificationBar(updatedList);
-  };
-
-  const updateNotificationBar = async (notifiList: NotificationItem[]) => {
-    await Notifications.dismissAllNotificationsAsync();
-    const activeNoti = notifiList.filter((item) => !item.completed);
-
-    if (activeNoti.length > 0) {
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "오늘의 할 일",
-          body: `${activeNoti.length}개의 할 일이 있습니다.`,
-          sticky: true,
-        },
-        trigger: {
-          type: "calendar",
-          hour: 0,
-          minute: 0,
-          repeats: true,
-        } as Notifications.CalendarTriggerInput,
-        //trigger: null,
-      });
-    } else {
-      await Notifications.dismissAllNotificationsAsync();
-    }
+    showNotification(updatedList);
   };
 
   return (
