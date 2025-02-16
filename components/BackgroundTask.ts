@@ -2,6 +2,7 @@ import * as TaskManager from "expo-task-manager";
 import * as BackgroundFetch from "expo-background-fetch";
 import * as Notifications from "expo-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { dailyResetNotification } from "@/components/UpdateNotificationBar";
 
 const resetStatus = "daily-reset-task";
 
@@ -23,16 +24,7 @@ TaskManager.defineTask(resetStatus, async () => {
       );
       await AsyncStorage.setItem("lastResetDate", today); // 마지막 초기화 날짜 저장
       await Notifications.dismissAllNotificationsAsync(); // 기존 알림 삭제
-
-      // 상태바 푸시 알림 보내기
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "오늘의 할 일",
-          body: `${notifications.length}개의 할 일이 있습니다.`,
-          sticky: true,
-        },
-        trigger: null,
-      });
+      await dailyResetNotification(notifications); // 알림 업데이트
     }
   }
 
