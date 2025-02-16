@@ -7,7 +7,6 @@ import TabBarBackground from "@/components/ui/TabBarBackground";
 import { Colors } from "@/constants/Colors";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import * as Notifications from "expo-notifications";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -27,43 +26,7 @@ export default function TabLayout() {
         Alert.alert("알림 권한이 거부되었습니다!");
       }
     })();
-    //sendNotification();
-    //setupDailyReset();
   }, []);
-  /* const sendNotification = async () => {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "알림 제목 테스트",
-        body: "알림 내용 테스트",
-        sticky: true,
-      },
-      trigger: null, // 즉시 보내려면 'trigger'에 'null'을 설정
-    });
-  }; */
-  /*  const setupDailyReset = async () => {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "📌 오늘의 할 일",
-        body: "할 일을 확인하세요!",
-      },
-      trigger: {
-        type: "calendar",
-        hour: 0,
-        minute: 0,
-        repeats: true,
-      } as Notifications.CalendarTriggerInput,
-    });
-
-    const saved = await AsyncStorage.getItem("notifications");
-
-    if (saved) {
-      const data = JSON.parse(saved).map((item: any) => ({
-        ...item,
-        completed: false,
-      }));
-      await AsyncStorage.setItem("notifications", JSON.stringify(data));
-    }
-  }; */
 
   return (
     <Tabs
@@ -74,7 +37,6 @@ export default function TabLayout() {
         tabBarBackground: TabBarBackground,
         tabBarStyle: Platform.select({
           ios: {
-            // Use a transparent background on iOS to show the blur effect
             position: "absolute",
           },
           default: {},
