@@ -1,16 +1,8 @@
-import { View, Text, TextInput, Button, Pressable } from "react-native";
+import { View, Text, TextInput, Button } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import * as Notifications from "expo-notifications";
-
-// 알림 데이터 타입 정의
-interface NotificationItem {
-  id: string;
-  title: string;
-  description: string;
-  completed: boolean;
-}
+import { NotificationItem } from "@/types/Notification";
 
 export default function NotificationScreen() {
   const router = useRouter();
