@@ -24,7 +24,7 @@ TaskManager.defineTask(resetStatus, async () => {
       );
       await AsyncStorage.setItem("lastResetDate", today); // 마지막 초기화 날짜 저장
       await Notifications.dismissAllNotificationsAsync(); // 기존 알림 삭제
-      await dailyResetNotification(notifications); // 알림 업데이트
+      dailyResetNotification(notifications); // 알림 업데이트
     }
   }
 
