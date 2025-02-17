@@ -12,13 +12,8 @@ export default function HomeScreen() {
 
   useEffect(() => {
     registerBackgroundTask(); // 백그라운드 태스크 등록
+    showNotification(notifications);
   }, []);
-
-  useEffect(() => {
-    if (notifications.length > 0) {
-      showNotification(notifications); // 앱 실행 시 상태바 알림 띄우기
-    }
-  }, [notifications]);
 
   useFocusEffect(
     useCallback(() => {
