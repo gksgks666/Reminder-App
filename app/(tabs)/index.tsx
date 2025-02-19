@@ -1,5 +1,5 @@
 import { View, Text, Button, FlatList } from "react-native";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { showNotification } from "@/components/UpdateNotificationBar";
@@ -15,11 +15,9 @@ export default function HomeScreen() {
     showNotification(notifications);
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      loadNotifications(); // 알림 목록 로드
-    }, [])
-  );
+  useFocusEffect(() => {
+    loadNotifications(); // 알림 목록 로드
+  });
 
   const loadNotifications = async () => {
     const savedNotifications = await AsyncStorage.getItem("notifications");
