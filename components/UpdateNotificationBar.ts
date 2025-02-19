@@ -8,19 +8,17 @@ export const showNotification = (notifiList: NotificationItem[]) => {
 };
 
 export const dailyResetNotification = (notifiList: NotificationItem[]) => {
-  const trigger = {
-    type: "calendar",
-    hour: 0,
-    minute: 0,
-    repeats: true,
-  } as Notifications.CalendarTriggerInput;
+  const trigger = new Date(Date.now() + 60 * 60 * 24);
+  trigger.setHours(0);
+  trigger.setMinutes(0);
+  trigger.setSeconds(0);
 
   updateNotificationBar(notifiList, trigger);
 };
 
 export const updateNotificationBar = async (
   notifiList: NotificationItem[],
-  trigger: Notifications.NotificationTriggerInput | null
+  trigger: any
 ) => {
   await Notifications.dismissAllNotificationsAsync();
   const activeNoti = notifiList.filter((item) => !item.completed);
