@@ -1,8 +1,8 @@
 import { View, Text, Button, FlatList } from "react-native";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { showNotification } from "@/components/UpdateNotificationBar";
+import { updateNotificationBar } from "@/components/UpdateNotificationBar";
 import { registerBackgroundTask } from "@/components/BackgroundTask";
 import { NotificationItem } from "@/types/Notification";
 
@@ -12,25 +12,26 @@ export default function HomeScreen() {
 
   useEffect(() => {
     registerBackgroundTask(); // 백그라운드 태스크 등록
-    showNotification(notifications);
   }, []);
 
-  useFocusEffect(() => {
-    loadNotifications(); // 알림 목록 로드
-  });
+  useFocusEffect(
+    useCallback(() => {
+      loadNotifications();
+    }, [])
+  );
 
   const loadNotifications = async () => {
     const savedNotifications = await AsyncStorage.getItem("notifications");
     const data = savedNotifications ? JSON.parse(savedNotifications) : [];
     setNotifications(data);
-    showNotification(data);
+    updateNotificationBar(data);
   };
 
   const deleteNotification = async (id: string) => {
     const updatedList = notifications.filter((item) => item.id !== id);
     setNotifications(updatedList);
     await AsyncStorage.setItem("notifications", JSON.stringify(updatedList));
-    showNotification(updatedList);
+    updateNotificationBar(updatedList);
   };
 
   const completeNotification = async (id: string) => {
@@ -40,7 +41,7 @@ export default function HomeScreen() {
 
     setNotifications(updatedList);
     await AsyncStorage.setItem("notifications", JSON.stringify(updatedList));
-    showNotification(updatedList);
+    updateNotificationBar(updatedList);
   };
 
   return (
