@@ -1,5 +1,5 @@
 // 알림 데이터 타입 정의
-interface NotificationItem {
+export interface NotificationItem {
   id: string;
   title: string;
   description: string;
