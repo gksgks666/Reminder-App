@@ -12,33 +12,43 @@ const isResetTime = () => {
   return hours >= 0 && hours < 9; // 00:00 ~ 08:59
 };
 
-TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
+const resetNotification = async () => {
   try {
-    if (!isResetTime()) return BackgroundFetch.BackgroundFetchResult.NoData;
+    const today = new Date().toISOString().split("T")[0];
+    const lastReset = await AsyncStorage.getItem("lastResetDate");
 
-    const saved = await AsyncStorage.getItem("notifications");
+    if (today !== lastReset) {
+      const saved = await AsyncStorage.getItem("notifications");
+      if (saved) {
+        const notifications = JSON.parse(saved).map((e: any) => ({
+          ...e,
+          completed: false,
+        }));
 
-    if (saved) {
-      const notifications = JSON.parse(saved).map((e: any) => ({
-        ...e,
-        completed: false,
-      }));
-
-      await AsyncStorage.setItem(
-        "notifications",
-        JSON.stringify(notifications)
-      );
-      await Notifications.dismissAllNotificationsAsync(); // 기존 알림 삭제
-      await updateNotificationBar(notifications); // 알림 업데이트
+        await AsyncStorage.setItem(
+          "notifications",
+          JSON.stringify(notifications)
+        );
+        await AsyncStorage.setItem("lastResetDate", today);
+        await Notifications.dismissAllNotificationsAsync(); // 기존 알림 삭제
+        await updateNotificationBar(notifications); // 알림 업데이트
+      }
     }
-    return BackgroundFetch.BackgroundFetchResult.NewData;
   } catch (error) {
     console.error("알림이 초기화되지 않음", error);
   }
+};
+
+TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
+  // isResetTime이 false면 background task를 실행하지 않음
+  if (!isResetTime()) return BackgroundFetch.BackgroundFetchResult.NoData;
+  await resetNotification();
+  return BackgroundFetch.BackgroundFetchResult.NewData;
 });
 
 export const registerBackgroundTask = async () => {
   const status = await BackgroundFetch.getStatusAsync();
+
   if (
     status === BackgroundFetch.BackgroundFetchStatus.Restricted ||
     status === BackgroundFetch.BackgroundFetchStatus.Denied
@@ -46,6 +56,9 @@ export const registerBackgroundTask = async () => {
     console.log("백그라운드 작업이 허용되지 않음");
     return;
   }
+
+  if (isResetTime()) await resetNotification();
+
   await BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
     minimumInterval: 60 * 60 * 9, // 9시간마다 실행
     stopOnTerminate: false, // 앱 종료 후에도 유지
