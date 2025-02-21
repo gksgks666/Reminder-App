@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NotificationItem } from "@/types/Notification";
+import { updateNotificationBar } from "@/components/UpdateNotificationBar";
 
 export default function NotificationScreen() {
   const router = useRouter();
@@ -22,6 +23,7 @@ export default function NotificationScreen() {
     const saved = await AsyncStorage.getItem("notifications");
     const notifications = saved ? JSON.parse(saved) : [];
     notifications.push(newNotification);
+    updateNotificationBar(notifications);
     await AsyncStorage.setItem("notifications", JSON.stringify(notifications));
 
     setTitle("");
