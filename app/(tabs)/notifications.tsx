@@ -23,7 +23,6 @@ export default function NotificationScreen() {
     const saved = await AsyncStorage.getItem("notifications");
     const notifications = saved ? JSON.parse(saved) : [];
     notifications.push(newNotification);
-    updateNotificationBar(notifications);
     await AsyncStorage.setItem("notifications", JSON.stringify(notifications));
 
     setTitle("");
