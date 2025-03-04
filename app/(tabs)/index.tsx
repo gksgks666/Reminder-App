@@ -1,4 +1,4 @@
-import { View, Text, Button, FlatList } from "react-native";
+import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import { useState, useEffect, useCallback } from "react";
 import { useRouter, useFocusEffect } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -45,23 +45,42 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={{ padding: 20 }}>
-      <Text style={{ fontSize: 20, fontWeight: "bold" }}>알림 목록</Text>
-      <Button title="알림 추가" onPress={() => router.push("/notifications")} />
+    <View className="flex-1 bg-white p-7">
+      <Text className="text-2xl font-bold mb-4">알림 목록</Text>
+      <TouchableOpacity
+        className="bg-[#B8E986] py-3 px-4 rounded-xl mb-4 items-center"
+        onPress={() => router.push("/notifications")}
+      >
+        <Text className="text-white font-semibold">알림 추가</Text>
+      </TouchableOpacity>
 
       <FlatList
         data={notifications}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={{ padding: 10, borderBottomWidth: 1 }}>
-            <Text>{item.title}</Text>
-            <Text>{item.description}</Text>
-            <Button
-              title="오늘 완료"
-              onPress={() => completeNotification(item.id)}
-              disabled={item.completed}
-            />
-            <Button title="삭제" onPress={() => deleteNotification(item.id)} />
+          <View className="bg-gray-100 p-4 rounded-xl shadow-md mb-3">
+            <Text className="text-lg font-semibold">{item.title}</Text>
+            <Text className="text-grey-600">{item.description}</Text>
+
+            <View className="flex-row mt-2">
+              <TouchableOpacity
+                className={`flex-1 py-2 rounded-xl mr-2 items-center ${
+                  item.completed ? "bg-gray-300" : "bg-[#B8E986]"
+                }`}
+                onPress={() => completeNotification(item.id)}
+                disabled={item.completed}
+              >
+                <Text className="text-white font-semibold">
+                  {item.completed ? "완료됨" : "오늘 완료"}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                className="flex-1 bg-red-400 py-2 rounded-xl items-center"
+                onPress={() => deleteNotification(item.id)}
+              >
+                <Text className="text-white font-semibold">삭제</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       />

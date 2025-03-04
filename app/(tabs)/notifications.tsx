@@ -1,9 +1,8 @@
-import { View, Text, TextInput, Button } from "react-native";
+import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NotificationItem } from "@/types/Notification";
-import { updateNotificationBar } from "@/components/UpdateNotificationBar";
 
 export default function NotificationScreen() {
   const router = useRouter();
@@ -37,22 +36,32 @@ export default function NotificationScreen() {
   };
 
   return (
-    <View style={{ padding: 20 }}>
-      <Text>새 알림 추가</Text>
+    <View className="flex-1 bg-white p-5">
+      <Text className="text-2xl font-bold mb-4 text-center">새 알림 추가</Text>
       <TextInput
         value={title}
         onChangeText={setTitle}
         placeholder="제목"
-        style={{ borderWidth: 1, padding: 8, marginBottom: 8 }}
+        className="border border-grey-300 rounded-xl px-4 py-3 mb-3 focus:border-[#B8E986] focus:ring-2 focus:ring-[#B8E986]"
       />
       <TextInput
         value={description}
         onChangeText={setDescription}
         placeholder="설명"
-        style={{ borderWidth: 1, padding: 8, marginBottom: 8 }}
+        className="border border-grey-300 rounded-xl px-4 py-3 mb-3 focus:border-[#B8E986] focus:ring-2 focus:ring-[#B8E986]"
       />
-      <Button title="추가" onPress={addNotification} />
-      <Button title="뒤로 가기" onPress={backNotification} />
+      <TouchableOpacity
+        className="bg-[#B8E986] py-3 rounded-xl items-center mb-3"
+        onPress={addNotification}
+      >
+        <Text className="text-white font-semibold">추가</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        className="bg-gray-400 py-3 rounded-xl items-center"
+        onPress={backNotification}
+      >
+        <Text className="text-white font-semibold">뒤로 가기</Text>
+      </TouchableOpacity>
     </View>
   );
 }
