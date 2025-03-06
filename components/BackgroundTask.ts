@@ -1,7 +1,10 @@
 import * as TaskManager from "expo-task-manager";
 import * as BackgroundFetch from "expo-background-fetch";
 import * as Notifications from "expo-notifications";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  AsyncStorageGetItem,
+  AsyncStorageSetItem,
+} from "@/components/AsyncStorage";
 import { updateNotificationBar } from "@/components/UpdateNotificationBar";
 
 const BACKGROUND_FETCH_TASK = "daily-reset-task";
@@ -15,21 +18,18 @@ const isResetTime = () => {
 const resetNotification = async () => {
   try {
     const today = new Date().toISOString().split("T")[0];
-    const lastReset = await AsyncStorage.getItem("lastResetDate");
+    const lastReset = await AsyncStorageGetItem("lastResetDate");
 
     if (today !== lastReset) {
-      const saved = await AsyncStorage.getItem("notifications");
+      const saved = await AsyncStorageGetItem("notifications");
       if (saved) {
         const notifications = JSON.parse(saved).map((e: any) => ({
           ...e,
           completed: false,
         }));
 
-        await AsyncStorage.setItem(
-          "notifications",
-          JSON.stringify(notifications)
-        );
-        await AsyncStorage.setItem("lastResetDate", today);
+        await AsyncStorageSetItem("notifications", notifications);
+        await AsyncStorageSetItem("lastResetDate", today);
         await Notifications.dismissAllNotificationsAsync(); // 기존 알림 삭제
         await updateNotificationBar(notifications); // 알림 업데이트
       }
