@@ -1,10 +1,13 @@
 import { View, Text, TextInput, TouchableOpacity } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  AsyncStorageGetItem,
+  AsyncStorageSetItem,
+} from "@/components/AsyncStorage";
 import { NotificationItem } from "@/types/Notification";
 
-export default function NotificationScreen() {
+const NotificationScreen = () => {
   const router = useRouter();
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -19,20 +22,22 @@ export default function NotificationScreen() {
       completed: false,
     };
 
-    const saved = await AsyncStorage.getItem("notifications");
+    const saved = await AsyncStorageGetItem("notifications");
     const notifications = saved ? JSON.parse(saved) : [];
     notifications.push(newNotification);
-    await AsyncStorage.setItem("notifications", JSON.stringify(notifications));
-
-    setTitle("");
-    setDescription("");
+    await AsyncStorageSetItem("notifications", notifications);
+    initState();
     router.replace("/");
   };
 
   const backNotification = () => {
+    initState();
+    router.back();
+  };
+
+  const initState = () => {
     setTitle("");
     setDescription("");
-    router.back();
   };
 
   return (
@@ -64,4 +69,6 @@ export default function NotificationScreen() {
       </TouchableOpacity>
     </View>
   );
-}
+};
+
+export default NotificationScreen;
