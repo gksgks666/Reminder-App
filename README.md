@@ -1,6 +1,6 @@
 # ReactNative + Typescript + Expo를 사용한 Reminder App
 
-ReactNative + Typescript + Expo(SDK52)를 사용한 간단한 상단바 push 알림 앱입니다.
+ReactNative + Typescript + Expo(SDK52)를 사용한 간단한 상단바 PUSH 알림 앱입니다.
 
 <br/>
 
@@ -33,3 +33,14 @@ ReactNative + Typescript + Expo(SDK52)를 사용한 간단한 상단바 push 알
 - 알림에 n개의 할일이 남아있는지 공지
 - 할일이 모두 완료처리 되었다면 모든 알림 삭제
 - 매일 00~09시 사이에 batch가 돌면서 모든 완료처리된 알림을 다시 활성화 및 상태바 알림 노출
+
+<br/>
+
+# 주요 기능
+
+### 상단바 PUSH 알림 제공
+
+
+<br/>
+
+### Background 작업을 활용한 상태 초기화
