@@ -29,18 +29,33 @@ ReactNative + Typescript + Expo(SDK52)를 사용한 간단한 상단바 PUSH 알
 
 # 프로젝트 소개
 
+- 매일 할일 추가, 완료 처리, 삭제 기능 구현
 - 스마트폰 상단바 PUSH 알림 제공
-- 알림에 n개의 할일이 남아있는지 공지
+- 알림 내용에 n개의 할일이 남아있는지 공지
 - 할일이 모두 완료처리 되었다면 모든 알림 삭제
-- 매일 00~09시 사이에 batch가 돌면서 모든 완료처리된 알림을 다시 활성화 및 상태바 알림 노출
+- 매일 00~09시 사이에 batch가 돌면서 모든 완료 처리된 알림을 다시 활성화 및 상태바 알림 노출
 
 <br/>
 
 # 주요 기능
 
-### 상단바 PUSH 알림 제공
+### 상단바 앱 PUSH 알림 제공
+- expo-notifications 라이브러리를 사용하여 상단바 알림 PUSH 제공
+- scheduleNotificationAsync 함수를 활용하여 알림 제목 및 내용(n개의 할일) 공지
+- AsyncStorage를 사용하여 매일 할일 데이터 저장
+- dismissAllNotificationsAsync 함수를 사용하여 알림 삭제
 
 
 <br/>
 
-### Background 작업을 활용한 상태 초기화
+### Background Task
+- expo-background-fetch를 활용하여 앱 종료시에도 background 작업을 진행하도록 설정
+- expo-task-manager를 이용하여 매일 00시~09시 사이에 background 작업을 진행하여 알림 데이터 초기화 진행
+- 00시~09시 사이에 앱에 접속했다면 즉시 background 작업을 실행하여 알림 데이터 초기화
+- 당일날 background 작업이 진실행되었다면 다시 실행하지 않도록 구현
+
+<br/>
+
+### 스타일링
+- ReactNative에서 tailwindcss를 사용할 수 있도록 nativewind 라이브러리를 활용
+- tailwindcss를 사용하여 스타일링 구현
